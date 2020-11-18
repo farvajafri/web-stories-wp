@@ -38,15 +38,16 @@ describe('Video output', () => {
       rotationAngle: 0,
       loop: true,
       tracks: [],
+      title: 'element title',
       resource: {
         type: 'video',
         mimeType: 'video/mp4',
         id: 123,
         src: 'https://example.com/image.png',
         poster: 'https://example.com/poster.png',
-        alt: 'alt text',
         height: 1920,
         width: 1080,
+        title: 'resource title',
       },
     },
     box: { width: 1080, height: 1920, x: 50, y: 100, rotationAngle: 0 },
@@ -74,24 +75,43 @@ describe('Video output', () => {
     await expect(<VideoOutput {...props} />).toBeValidAMPStoryElement();
   });
 
-  it('an undefined alt tag in the element should fall back to the resource', async () => {
-    const props = {
-      ...baseProps,
-      element: { ...baseProps.element, alt: undefined },
-    };
-    const output = <VideoOutput {...props} />;
+  it(`uses the element's title for the title attribute`, async () => {
+    const output = <VideoOutput {...baseProps} />;
     await expect(output).toBeValidAMPStoryElement();
     const outputStr = renderToStaticMarkup(output);
-    await expect(outputStr).toStrictEqual(expect.stringMatching('alt text'));
+    expect(outputStr).toStrictEqual(
+      expect.stringMatching(`title="element title"`)
+    );
   });
 
-  it('an empty string alt tag in the element should not fall back to the resource', async () => {
-    const props = { ...baseProps, element: { ...baseProps.element, alt: '' } };
+  it(`should fall back to the resource's title if the element's title is undefined`, () => {
+    const props = { ...baseProps };
+    delete props.element.title;
     const output = <VideoOutput {...props} />;
-    await expect(output).toBeValidAMPStoryElement();
     const outputStr = renderToStaticMarkup(output);
-    await expect(outputStr).not.toStrictEqual(
-      expect.stringMatching('alt text')
+    expect(outputStr).toStrictEqual(
+      expect.stringMatching(`title="resource title"`)
+    );
+  });
+
+  it(`should not fall back to the resource's title if the element's title is an empty string`, () => {
+    const props = { ...baseProps };
+    props.element.title = '';
+    const output = <VideoOutput {...props} />;
+    const outputStr = renderToStaticMarkup(output);
+    expect(outputStr).not.toStrictEqual(
+      expect.stringMatching(`title="resource title"`)
+    );
+    expect(outputStr).toStrictEqual(expect.stringMatching(`title=""`));
+  });
+
+  it(`should use element's title for the alt attribute`, () => {
+    const props = { ...baseProps };
+    props.element.title = 'element title';
+    const output = <VideoOutput {...props} />;
+    const outputStr = renderToStaticMarkup(output);
+    expect(outputStr).toStrictEqual(
+      expect.stringMatching(`alt="element title"`)
     );
   });
 });
