@@ -93,7 +93,7 @@ function VideoAccessibilityPanel({ selectedElements, pushUpdate }) {
       </Row>
       <Row>
         <ExpandedTextInput
-          placeholder={__('Title', 'web-stories')}
+          placeholder={__('Include any burned-in text', 'web-stories')}
           value={title || ''}
           onChange={(value) => pushUpdate({ title: value || null })}
           clear
@@ -102,7 +102,9 @@ function VideoAccessibilityPanel({ selectedElements, pushUpdate }) {
         />
       </Row>
       <Row>
-        <Note>{__('Text for visually impaired users.', 'web-stories')}</Note>
+        <Note>
+          {__('Description for indexability and accessibility.', 'web-stories')}
+        </Note>
       </Row>
     </SimplePanel>
   );
